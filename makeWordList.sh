@@ -15,4 +15,4 @@ done
 
 rm words.txt
 [[ -d ~/.tuxtype/words ]] || mkdir -p ~/.tuxtype/words
-cp $wordListFile ~/.tuxtype/words/
+mv $wordListFile ~/.tuxtype/words/
