@@ -7,7 +7,7 @@ wordListFile="wordList_${build_date}.txt"
 
 echo "$USER" > $wordListFile
 
-egrep -i "^[${words_learnt}asdefjkil]{1,}$" /usr/share/dict/words > words.txt
+egrep -i "^[${words_learnt}]{1,}$" /usr/share/dict/words | sort > words.txt
 
 for word in $(cat words.txt); do
 	echo "${word^^}" >> $wordListFile
