@@ -3,9 +3,9 @@ Learning how to type (on Linux)? Want to play tuxtype but still haven't complete
 **Then tuxtype-make-wordlist's makeWordList.sh is the right script for you!!!**
 
 ## Scripts, how do they work?
-You just call the script like so:
+You just call the script like so (in the terminal):
 ```shellscript
-bash makeWordList.sh asdf
+$ bash makeWordList.sh asdf # make sure you are in the same directory as the script
 ```
 Instead of 'asdf', just enter the keys that you have learned. The script will go through the file
 */usr/share/dict/words* and *egrep* all the words made from only the selected letters and create a
