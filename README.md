@@ -4,9 +4,9 @@ Learning how to type (on Linux)? Want to play tuxtype but still haven't complete
 
 ## Scripts, how do they work?
 You just call the script like so:
-'''shellscript
+```shellscript
 bash makeWordList.sh asdf
-'''
+```
 Instead of 'asdf', just enter the keys that you have learned. The script will go through the file
 */usr/share/dict/words* and *egrep* all the words made from only the selected letters and create a
 word list file (the level file) out of it, and will copy that to *~/.tuxtype/words*.
@@ -16,6 +16,6 @@ stuff that shows up?), go to the next page using the arrow at the bottom and you
 word list file with the name **$USER [Keys: *keys_you_have_learned*]** where *$USER* is your username.
 
 And that's it!
-Hope you have a lot of fun! :+1: :v: :simple_smile:
+Hope you have a lot of fun! :+1: :v: 
 
 ![Adding this picture of baby Tux because he's so cute (and I need to learn markdown)](https://www.gnu.org/graphics/babies/BabyTuxAlpha.png)
