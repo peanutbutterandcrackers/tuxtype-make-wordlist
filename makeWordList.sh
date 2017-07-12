@@ -14,6 +14,5 @@ for word in $(cat words.txt); do
 done
 
 rm words.txt
-rm ~/.tuxtype/words/wordList_*.txt
 [[ -d ~/.tuxtype/words ]] || mkdir -p ~/.tuxtype/words
 cp $wordListFile ~/.tuxtype/words/
