@@ -1,14 +1,12 @@
 #!/bin/bash
 
 words_learnt=$(echo $1 | egrep -o . | sort | tr -d '\n')
-
-build_date=$(date +%F)
+build_date=$(date +%F_%T)
 wordListFile="wordList_${build_date}.txt"
 
 echo "$USER [Keys: ${words_learnt^^}]" > $wordListFile
 
 egrep -i "^[${words_learnt}]{1,}$" /usr/share/dict/words | sort > words.txt
-
 for word in $(cat words.txt); do
 	echo "${word^^}" >> $wordListFile
 done
