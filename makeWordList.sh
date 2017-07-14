@@ -18,10 +18,26 @@ for word in $(cat words.txt); do
 	if [ ${#non_alpha_keys_learnt} -eq 0 ]; then
 		echo "${word^^}" >> $wordListFile
 	else
+		case $RANDOM in
+			1) #code
+			   ;;
+			2) #code
+			   ;;
+			3) #code
+			   ;;
+			4) #code
+			   ;;
+			*) #code # for the most-common one
+			   ;;
+		esac
 		# prefix: number - single digit <---> postfix: punctuation/special mark - one at a time
 		# Have 4 switches here: 1. just word 2. num-word 3. word-special_mark 4. num-word-special_mark
 		# To select the number: get random index from the numeric_keys array: $RANDOM%${#numeric_keys[@]}  
 		# To select the special_key: $RANDOM%${#special_keys[@]}
+		# Have another 5th switch to make up sentence-like thingies. num-word-char-space-word-period
+		# The 5th switch should be the rarest
+		# 4th switch, 3rd and 2nd should go hand in hand and should be the most common
+		# 1 should be rare too
 	fi
 done
 
