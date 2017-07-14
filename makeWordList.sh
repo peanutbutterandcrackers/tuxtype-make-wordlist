@@ -18,7 +18,7 @@ for word in $(cat words.txt); do
 	if [ ${#non_alpha_keys_learnt} -eq 0 ]; then
 		echo "${word^^}" >> $wordListFile
 	else
-		case $RANDOM in
+		case $((($RANDOM % 5) + 1)) in
 			1) #code
 			   ;;
 			2) #code
@@ -27,7 +27,7 @@ for word in $(cat words.txt); do
 			   ;;
 			4) #code
 			   ;;
-			*) #code # for the most-common one
+			5) #code 
 			   ;;
 		esac
 		# prefix: number - single digit <---> postfix: punctuation/special mark - one at a time
