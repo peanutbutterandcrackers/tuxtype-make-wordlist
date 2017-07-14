@@ -4,9 +4,14 @@ words_learnt=$(echo $1 | egrep -o . | sort | tr -d '\n')
 non_alpha_keys_learnt=$(echo $2)
 
 declare -a numeric_keys
-numeric_keys=($(echo $2 | tr -c -d [:digit:] | egrep -o . | sort | tr '\n' ' '))
-declare -a punctuation keys
-special_keys=($(echo $2 | tr -d [:digit:] | egrep -o . | sort | tr '\n' ' '))
+readarray -t numeric_keys < <(echo $2 | tr -c -d [:digit:] | egrep -o . | sort)
+declare -a special_keys
+readarray -t special_keys < <(echo $2 | tr -d [:digit:] | egrep -o . | sort)
+echo $words_learnt
+echo $non_alpha_keys_learnt
+echo $2
+echo "${numeric_keys[@]}"
+echo "${special_keys[@]}"
 
 build_date=$(date +%F_%T)
 wordListFile="wordList_${build_date}.txt"
@@ -24,7 +29,7 @@ for word in $(cat words.txt); do
 			   # Group command follows:
 			   { echo -n ${numeric_keys[@]:$((($RANDOM%${#numeric_keys[@]}) + 1)) \
 			   							  :$((($RANDOM%3) + 1))};
-			     echo -n " ${special_keys[$(( ($RANDOM % ${#special_keys[@]}) + 1))]}"; 
+			     echo -n " ${special_keys[$((($RANDOM%${#special_keys[@]}) + 1))]}"; 
 				 echo -n "${word^^}";
 			     echo "${special_keys[$(( ($RANDOM % ${#special_keys[@]}) + 1))]}";
 			   } >> $wordListFile
