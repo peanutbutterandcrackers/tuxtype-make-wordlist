@@ -11,6 +11,24 @@ readarray -t special_keys < <(echo $2 | tr -d [:digit:] | egrep -o . | sort | un
 build_date=$(date +%F_%T)
 wordListFile="wordList_${build_date}.txt"
 
+get_random_number () {
+	arr=("$@")
+	maxdigits=$((RANDOM%3+1))
+	jumbled=($(for i in "${arr[@]}"; do
+				echo $i
+			done | sort -R | sort -R))
+	echo "${jumbled[@]:0:$maxdigits}" | tr -d ' '
+	return
+	}
+
+get_random_index () {
+	arr=("$@")
+	arr_len=${#arr[@]}
+	index=$((RANDOM%$arr_len))
+	echo $index
+	return
+	}
+
 echo "$USER [Keys: ${words_learnt^^} ${numeric_keys[@]} ${special_keys[@]}]" > $wordListFile
 
 egrep -i "^[${words_learnt}]{1,}$" /usr/share/dict/words | sort -R | uniq > words.txt
@@ -22,26 +40,23 @@ for word in $(cat words.txt); do
 			1) # The rarest one
 			   # Sample: "123 !Potato@" "7 ^meat("
 			   # Group command follows:
-			   { echo -n ${numeric_keys[@]:$((($RANDOM%${#numeric_keys[@]}))) \
-			   							  :$((($RANDOM%3) + 1))} | tr -d ' ';
-			     echo -n " ${special_keys[$((($RANDOM%${#special_keys[@]})))]}"; 
+			   { echo -n $(get_random_number "${numeric_keys[@]}");
+			     echo -n " ${special_keys[$(get_random_index "${special_keys[@]}")]}"; 
 				 echo -n "${word^^}";
-			     echo "${special_keys[$(( ($RANDOM % ${#special_keys[@]}) + 1))]}";
+			     echo "${special_keys[$(get_random_index "${special_keys[@]}")]}";
 			   } >> $wordListFile
 			   ;;
 			2) # The 2nd-to-rarest one
 			   # Sample: '12 animal' '123 word'
 			   # Group command follows, again:
-			   { echo -n ${numeric_keys[@]:$((($RANDOM%${#numeric_keys[@]}))) \
-			   							  :$((($RANDOM%3) + 1))} | tr -d ' ';
+			   { echo -n $(get_random_number "${numeric_keys[@]}");
 				 echo " ${word^^}";
 			   } >> $wordListFile
 			   ;;
 			3) # The 3rd-to-rarest one
 			   # Sample: '12 seashore@' '983 potato!'
-			   { echo -n ${numeric_keys[@]:$((($RANDOM%${#numeric_keys[@]}))) \
-			   							  :$((($RANDOM%3) + 1))} | tr -d ' ';
-				 echo " ${word^^}";
+			   { echo -n $(get_random_number "${numeric_keys[@]}");
+				 echo " ${word^^}${special_keys[$(get_random_index "${special_keys[@]}")]}";
 			   } >> $wordListFile	
 			   ;;
 			4) # Frequent one(s)
@@ -51,8 +66,7 @@ for word in $(cat words.txt); do
 					echo "$(sed -n $((($RANDOM%$(wc -l words.txt)) + 1))p words.txt)."; } >> $wordListFile
 			   else
 			   		# Sample: '123 potato', '12 tomato'
-			   		{ echo -n ${numeric_keys[@]:$((($RANDOM%${#numeric_keys[@]}))) \
-			   								  :$((($RANDOM%3) + 1))} | tr -d ' ';
+			   		{ echo -n $(get_random_number "${numeric_keys[@]}");
 					  echo " ${word^^}"; } >> $wordListFile
 			   fi
 			   ;;
@@ -70,8 +84,6 @@ for word in $(cat words.txt); do
 		# 4th switch, 3rd and 2nd should go hand in hand and should be the most common
 		# 1 should be rare too
 	fi
-	# Jumble the numeric keys here so that each time through the loop, there would be a new combination of number
-	numeric_keys=($(for i in "${numeric_keys[@]}"; do echo $i; done | sort -R))
 done
 
 rm words.txt
