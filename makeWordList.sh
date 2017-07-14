@@ -22,43 +22,43 @@ for word in $(cat words.txt); do
 			1) # The rarest one
 			   # Sample: "123 !Potato@" "7 ^meat("
 			   # Group command follows:
-			   { echo -n ${numeric_keys[@]:$((($RANDOM%${#numeric_keys[@]}) + 1)) \
-			   							  :$((($RANDOM%3) + 1))};
-			     echo -n " ${special_keys[$((($RANDOM%${#special_keys[@]}) + 1))]}"; 
+			   { echo -n ${numeric_keys[@]:$((($RANDOM%${#numeric_keys[@]}))) \
+			   							  :$((($RANDOM%3) + 1))} | tr -d ' ';
+			     echo -n " ${special_keys[$((($RANDOM%${#special_keys[@]})))]}"; 
 				 echo -n "${word^^}";
-			     echo "${special_keys[$(( ($RANDOM % ${#special_keys[@]}) + 1))]}";
+			     echo "${special_keys[$(( ($RANDOM % ${#special_keys[@]}) + 1))]}" '';
 			   } >> $wordListFile
 			   ;;
 			2) # The 2nd-to-rarest one
 			   # Sample: '12 animal' '123 word'
 			   # Group command follows, again:
-			   { echo -n ${numeric_keys[@]:$((($RANDOM%${#numeric_keys[@]}) + 1)) \
-			   							  :$((($RANDOM%3) + 1))};
-				 echo " ${word^^}";
+			   { echo -n ${numeric_keys[@]:$((($RANDOM%${#numeric_keys[@]}))) \
+			   							  :$((($RANDOM%3) + 1))} | tr -d ' ';
+				 echo " ${word^^}" '';
 			   } >> $wordListFile
 			   ;;
 			3) # The 3rd-to-rarest one
 			   # Sample: '12 seashore@' '983 potato!'
-			   { echo -n ${numeric_keys[@]:$((($RANDOM%${#numeric_keys[@]}) + 1)) \
-			   							  :$((($RANDOM%3) + 1))};
-				 echo " ${word^^}";
+			   { echo -n ${numeric_keys[@]:$((($RANDOM%${#numeric_keys[@]}))) \
+			   							  :$((($RANDOM%3) + 1))} | tr -d ' ';
+				 echo " ${word^^}" '';
 			   } >> $wordListFile	
 			   ;;
 			4) # Frequent one(s)
 			   if [[ $special_keys =~ ,. ]]; then
 			   		# Sample: "animal, potato, cauliflower."
 			   		{ echo -n "${word^^}, ";
-					echo "$(sed -n $((($RANDOM%$(wc -l words.txt)) + 1))p words.txt)."; } >> $wordListFile
+					echo "$(sed -n $((($RANDOM%$(wc -l words.txt)) + 1))p words.txt)." ''; } >> $wordListFile
 			   else
 			   		# Sample: '123 potato', '12 tomato'
-			   		{ echo -n ${numeric_keys[@]:$((($RANDOM%${#numeric_keys[@]}) + 1)) \
-			   								  :$((($RANDOM%3) + 1))};
-					  echo " ${word^^}"; } >> $wordListFile
+			   		{ echo -n ${numeric_keys[@]:$((($RANDOM%${#numeric_keys[@]}))) \
+			   								  :$((($RANDOM%3) + 1))} | tr -d ' ';
+					  echo " ${word^^}" ''; } >> $wordListFile
 			   fi
 			   ;;
 			5) # Most common one 
 			   # Sample: 'animal' 'bird' 'cat'
-			   echo "${word^^}" >> $wordListFile
+			   echo "${word^^}" ''>> $wordListFile
 			   ;;
 		esac
 		# prefix: number - single digit <---> postfix: punctuation/special mark - one at a time
