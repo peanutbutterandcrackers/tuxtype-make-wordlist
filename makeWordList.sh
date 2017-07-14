@@ -1,12 +1,12 @@
 #!/bin/bash
 
-words_learnt=$(echo $1 | egrep -o . | sort | tr -d '\n')
+words_learnt=$(echo $1 | egrep -o . | sort | uniq | tr -d '\n')
 non_alpha_keys_learnt=$(echo $2)
 
 declare -a numeric_keys
-readarray -t numeric_keys < <(echo $2 | tr -c -d [:digit:] | egrep -o . | sort)
+readarray -t numeric_keys < <(echo $2 | tr -c -d [:digit:] | egrep -o . | sort | uniq)
 declare -a special_keys
-readarray -t special_keys < <(echo $2 | tr -d [:digit:] | egrep -o . | sort)
+readarray -t special_keys < <(echo $2 | tr -d [:digit:] | egrep -o . | sort | uniq)
 
 build_date=$(date +%F_%T)
 wordListFile="wordList_${build_date}.txt"
