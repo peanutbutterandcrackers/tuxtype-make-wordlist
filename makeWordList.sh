@@ -11,7 +11,7 @@ readarray -t special_keys < <(echo $2 | tr -d [:digit:] | egrep -o . | sort)
 build_date=$(date +%F_%T)
 wordListFile="wordList_${build_date}.txt"
 
-echo "$USER [Keys: ${words_learnt^^} $numeric_keys $special_keys]" > $wordListFile
+echo "$USER [Keys: ${words_learnt^^} ${numeric_keys[@]} ${special_keys[@]}]" > $wordListFile
 
 egrep -i "^[${words_learnt}]{1,}$" /usr/share/dict/words | sort -R | uniq > words.txt
 for word in $(cat words.txt); do
