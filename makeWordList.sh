@@ -11,7 +11,7 @@ special_keys=($(echo $2 | tr -d [:digit:] | egrep -o . | sort | tr '\n' ' '))
 build_date=$(date +%F_%T)
 wordListFile="wordList_${build_date}.txt"
 
-echo "$USER [Keys: ${words_learnt^^}]" > $wordListFile
+echo "$USER [Keys: ${words_learnt^^} $numeric_keys $special_keys]" > $wordListFile
 
 egrep -i "^[${words_learnt}]{1,}$" /usr/share/dict/words | sort -R | uniq > words.txt
 for word in $(cat words.txt); do
@@ -19,15 +19,46 @@ for word in $(cat words.txt); do
 		echo "${word^^}" >> $wordListFile
 	else
 		case $((($RANDOM % 5) + 1)) in
-			1) #code
+			1) # The rarest one
+			   # Sample: "123 !Potato@" "7 ^meat("
+			   # Group command follows:
+			   { echo -n ${numeric_keys[@]:$((($RANDOM%${#numeric_keys[@]}) + 1)) \
+			   							  :$((($RANDOM%3) + 1))};
+			     echo -n " ${special_keys[$(( ($RANDOM % ${#special_keys[@]}) + 1))]}"; 
+				 echo -n "${word^^}";
+			     echo "${special_keys[$(( ($RANDOM % ${#special_keys[@]}) + 1))]}";
+			   } >> $wordListFile
 			   ;;
-			2) #code
+			2) # The 2nd-to-rarest one
+			   # Sample: '12 animal' '123 word'
+			   # Group command follows, again:
+			   { echo -n ${numeric_keys[@]:$((($RANDOM%${#numeric_keys[@]}) + 1)) \
+			   							  :$((($RANDOM%3) + 1))};
+				 echo " ${word^^}";
+			   } >> $wordListFile
 			   ;;
-			3) #code
+			3) # The 3rd-to-rarest one
+			   # Sample: '12 seashore@' '983 potato!'
+			   { echo -n ${numeric_keys[@]:$((($RANDOM%${#numeric_keys[@]}) + 1)) \
+			   							  :$((($RANDOM%3) + 1))};
+				 echo " ${word^^}";
+			   } >> $wordListFile	
 			   ;;
-			4) #code
+			4) # Frequent one(s)
+			   if [[ $special_keys =~ ,. ]]; then
+			   		# Sample: "animal, potato, cauliflower."
+			   		{ echo -n "${word^^}, ";
+					echo "$(sed -n $((($RANDOM%$(wc -l words.txt)) + 1))p words.txt)."; } >> $wordListFile
+			   else
+			   		# Sample: '123 potato', '12 tomato'
+			   		{ echo -n ${numeric_keys[@]:$((($RANDOM%${#numeric_keys[@]}) + 1)) \
+			   								  :$((($RANDOM%3) + 1))};
+					  echo " ${word^^}"; } >> $wordListFile
+			   fi
 			   ;;
-			5) #code 
+			5) # Most common one 
+			   # Sample: 'animal' 'bird' 'cat'
+			   echo "${word^^}" >> $wordListFile
 			   ;;
 		esac
 		# prefix: number - single digit <---> postfix: punctuation/special mark - one at a time
@@ -39,6 +70,8 @@ for word in $(cat words.txt); do
 		# 4th switch, 3rd and 2nd should go hand in hand and should be the most common
 		# 1 should be rare too
 	fi
+	# Jumble the numeric keys here so that each time through the loop, there would be a new combination of number
+	numeric_keys=($(for i in "${numeric_keys[@]}"; do echo $i; done | sort -R))
 done
 
 rm words.txt
