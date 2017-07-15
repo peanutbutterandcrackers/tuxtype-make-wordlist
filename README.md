@@ -48,7 +48,7 @@ practice the alphabetic keys using another word list file.
 $ bash makeWordList.sh abcdefghijklmnopqrstuvwxyz # This works well.
 ```
 ```shellscript
-$ bash makeWordList.sh asdfejkligh '!@#$%^&*()"{}[]_+-=./,><' # This works well too
+$ bash makeWordList.sh asdfejkligh '1234567890!@#$%^&*()"{}[]_+-=./,><' # This works well too
 ```
 ```shellscript
 $ bash makeWordList.sh abcdefghijklmnopqrstuvwxyz '!@#$&*)(*^&)*&?>' # This does not work so well. Takes roughly 20 min on my machine
