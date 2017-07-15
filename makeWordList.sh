@@ -41,8 +41,8 @@ for word in $(cat words.txt); do
 			1) # The rarest one
 			   # Sample: "123 !Potato@" "7 ^meat("
 			   # Group command follows:
-			   { echo -n $(get_random_number "${numeric_keys[@]}");
-			     echo -n " ${special_keys[$(get_random_index "${special_keys[@]}")]}"; 
+			   { echo -n $(get_random_number "${numeric_keys[@]}") "";
+			     echo -n "${special_keys[$(get_random_index "${special_keys[@]}")]}"; 
 				 echo -n "${word^^}";
 			     echo "${special_keys[$(get_random_index "${special_keys[@]}")]}";
 			   } >> $wordListFile
@@ -50,14 +50,14 @@ for word in $(cat words.txt); do
 			2) # The 2nd-to-rarest one
 			   # Sample: '12 animal' '123 word'
 			   # Group command follows, again:
-			   { echo -n $(get_random_number "${numeric_keys[@]}");
-				 echo " ${word^^}";
+			   { echo -n $(get_random_number "${numeric_keys[@]}") "";
+				 echo "${word^^}";
 			   } >> $wordListFile
 			   ;;
 			3) # The 3rd-to-rarest one
 			   # Sample: '12 seashore@' '983 potato!'
-			   { echo -n $(get_random_number "${numeric_keys[@]}");
-				 echo " ${word^^}${special_keys[$(get_random_index "${special_keys[@]}")]}";
+			   { echo -n $(get_random_number "${numeric_keys[@]}") "";
+				 echo "${word^^}${special_keys[$(get_random_index "${special_keys[@]}")]}";
 			   } >> $wordListFile	
 			   ;;
 			4) # Frequent one(s)
@@ -67,8 +67,8 @@ for word in $(cat words.txt); do
 					echo "$(sed -n $((($RANDOM%$(wc -l words.txt)) + 1))p words.txt)."; } >> $wordListFile
 			   else
 			   		# Sample: '123 potato', '12 tomato'
-			   		{ echo -n $(get_random_number "${numeric_keys[@]}");
-					  echo " ${word^^}"; } >> $wordListFile
+			   		{ echo -n $(get_random_number "${numeric_keys[@]}") "";
+					  echo "${word^^}"; } >> $wordListFile
 			   fi
 			   ;;
 			5) # Most common one 
