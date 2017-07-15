@@ -10,7 +10,8 @@ declare -a special_keys
 readarray -t special_keys < <(echo $2 $auto_add | tr -d [:digit:][:space:] | egrep -o . | sort | uniq)
 
 build_date=$(date +%F_%T)
-wordListFile="wordList_${build_date}.txt"
+words_buffer_file='/tmp/words.txt'
+wordListFile="/tmp/wordList_${build_date}.txt"
 
 get_random_number () {
 	arr=("$@")
@@ -32,8 +33,8 @@ get_random_index () {
 
 echo "$USER [Keys: ${words_learnt^^} ${numeric_keys[@]} ${special_keys[@]}]" > $wordListFile
 
-egrep -i "^[${words_learnt}]{1,}$" /usr/share/dict/words | sort -R | uniq > words.txt
-for word in $(cat words.txt); do
+egrep -i "^[${words_learnt}]{1,}$" /usr/share/dict/words | sort -R | uniq > $words_buffer_file
+for word in $(cat $words_buffer_file); do
 	if [ ${#non_alpha_keys_learnt} -eq 0 ]; then
 		echo "${word^^}" >> $wordListFile
 	else
@@ -88,6 +89,6 @@ for word in $(cat words.txt); do
 	word_buffer=$word # preserves 'another word' for case 4a
 done
 
-rm words.txt
+rm $words_buffer_file
 [[ -d ~/.tuxtype/words ]] || mkdir -p ~/.tuxtype/words
 mv $wordListFile ~/.tuxtype/words/
