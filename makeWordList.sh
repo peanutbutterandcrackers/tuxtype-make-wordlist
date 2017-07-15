@@ -61,10 +61,10 @@ for word in $(cat words.txt); do
 			   } >> $wordListFile	
 			   ;;
 			4) # Frequent one(s)
-			   if [[ $special_keys =~ ,. ]]; then
+			   if [[ "${special_keys[@]}" =~ ,. ]]; then
 			   		# Sample: "animal, potato, cauliflower."
 			   		{ echo -n "${word^^}, ";
-					echo "$(sed -n $((($RANDOM%$(wc -l words.txt)) + 1))p words.txt)."; } >> $wordListFile
+					  echo "${word_buffer^^}."; } >> $wordListFile
 			   else
 			   		# Sample: '123 potato', '12 tomato'
 			   		{ echo -n $(get_random_number "${numeric_keys[@]}") "";
@@ -85,6 +85,7 @@ for word in $(cat words.txt); do
 		# 4th switch, 3rd and 2nd should go hand in hand and should be the most common
 		# 1 should be rare too
 	fi
+	word_buffer=$word # preserves 'another word' for case 4a
 done
 
 rm words.txt
