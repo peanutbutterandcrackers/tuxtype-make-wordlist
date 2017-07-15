@@ -30,14 +30,15 @@ $ bash makeWordList.sh asdf '78293#$"{}'
 ```
 * **Do not forget to put single quotes around the non-alphabetic keys.**
 * You can not have single quotes (') in the non-alphabetic-keys part there.  
-  If you enter ", the script will also include ' for you to practice.
+  If you enter double-quote ("), the script will also include a single-quote (') for you to practice.
 
-# The Final Syntax:
+## The Final Syntax:
 ```shellscript
 $ bash makeWordList.sh alphabeticKeys ['non-alphabetic_keys enclosed in single quotes']
 ```
+* Just in case you're confused by the brackets there ([]), it just means that is optional. Do **not** type the brackets in.
 
-# Known Issues:
+## Known Issues:
 * The script does take a LOT of time to execute. It isn't an endless-loop, but this issue needs to be fixed.
 
 And that's it!
