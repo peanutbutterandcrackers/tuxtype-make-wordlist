@@ -7,6 +7,7 @@ declare -a numeric_keys
 readarray -t numeric_keys < <(echo $2 | tr -c -d [:digit:] | egrep -o . | sort | uniq)
 declare -a special_keys
 readarray -t special_keys < <(echo $2 | tr -d [:digit:] | egrep -o . | sort | uniq)
+[[ "$2" =~ \" ]] && special_keys+=(\')
 
 build_date=$(date +%F_%T)
 wordListFile="wordList_${build_date}.txt"
