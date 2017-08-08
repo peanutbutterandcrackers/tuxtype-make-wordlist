@@ -38,22 +38,6 @@ $ bash makeWordList.sh alphabeticKeys ['non-alphabetic_keys enclosed in single q
 ```
 * Just in case you're confused by the brackets there ([]), it just means that is optional. Do **not** type the brackets in.
 
-## Known Issues:
-* The script does take a LOT of time to execute. It isn't an endless-loop, but this issue needs to be fixed.
-
-## Work-arounds:
-* If you're practicing non-alphabetic keys, do not use more than 10 alphabetic keys to generate the word list file. You can
-practice the alphabetic keys using another word list file.
-```shellscript
-$ bash makeWordList.sh abcdefghijklmnopqrstuvwxyz # This works well.
-```
-```shellscript
-$ bash makeWordList.sh asdfejkligh '1234567890!@#$%^&*()"{}[]_+-=./,><' # This works well too
-```
-```shellscript
-$ bash makeWordList.sh abcdefghijklmnopqrstuvwxyz '!@#$&*)(*^&)*&?>' # This does not work so well. Takes roughly 20 min on my machine
-```
-
 And that's it!
 Hope you have a lot of fun! :+1: :v: 
 
