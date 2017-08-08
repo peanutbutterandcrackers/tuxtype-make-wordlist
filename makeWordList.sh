@@ -36,7 +36,7 @@ get_random_index () {
 
 echo "$USER [Keys: ${words_learnt^^} ${numeric_keys[@]} ${special_keys[@]}]" > $wordListFile
 
-egrep -i "^[${words_learnt}]{1,}$" /usr/share/dict/words | sort -R | uniq > $words_buffer_file
+egrep -i "^[${words_learnt}]{1,}$" /usr/share/dict/words | sort -i | uniq -i | sort -R > $words_buffer_file
 for word in $(cat $words_buffer_file); do
 	if [ ${#non_alpha_keys_learnt} -eq 0 ]; then
 		echo "${word^^}" >> $wordListFile
