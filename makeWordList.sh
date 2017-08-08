@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# don't need Unicode support, disabling it gives significant performance gain
+export LC_ALL=C
+
 words_learnt=$(echo $1 | egrep -o . | sort | uniq | tr -d '\n')
 non_alpha_keys_learnt=$(echo $2)
 
