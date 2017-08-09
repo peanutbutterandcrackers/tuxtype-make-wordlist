@@ -13,8 +13,9 @@ declare -a special_keys
 readarray -t special_keys < <(echo $2 $auto_add | tr -d [:digit:][:space:] | egrep -o . | sort | uniq)
 
 build_date=$(date +%F_%T)
-words_buffer_file='/tmp/words.txt'
-wordListFile="/tmp/wordList_${build_date}.txt"
+script_name=$(basename $0)
+words_buffer_file=$(mktemp /tmp/${script_name%%.*}-words.$$.XXXXX.txt)
+wordListFile=$(mktemp /tmp/${script_name%%.*}-wordList.$$.XXXXX.txt)
 
 get_random_number () {
 	arr=("$@")
@@ -96,4 +97,4 @@ done
 
 rm $words_buffer_file
 [[ -d ~/.tuxtype/words ]] || mkdir -p ~/.tuxtype/words
-mv $wordListFile ~/.tuxtype/words/
+mv $wordListFile ~/.tuxtype/words/wordList_${build_date}.txt
