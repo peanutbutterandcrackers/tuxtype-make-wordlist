@@ -34,6 +34,8 @@ get_random_index () {
 	return
 	}
 
+trap "rm $words_buffer_file $wordListFile && exit 1" SIGINT SIGTERM
+
 echo "$USER [Keys: ${words_learnt^^} ${numeric_keys[@]} ${special_keys[@]}]" > $wordListFile
 
 egrep -i "^[${words_learnt}]{1,}$" /usr/share/dict/words | sort -i | uniq -i | sort -R | head -n 777 > $words_buffer_file
