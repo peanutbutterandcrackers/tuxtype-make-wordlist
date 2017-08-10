@@ -32,10 +32,10 @@ get_random_index () {
 	}
 
 main () {
-	echo "$USER [Keys: ${words_learnt^^} ${numeric_keys[@]} ${special_keys[@]}]" > $WORD_LIST_FILE
-	
+	echo "${user_name:-$USER} [Keys: ${words_learnt^^} ${numeric_keys[@]} ${special_keys[@]}]" > $WORD_LIST_FILE
+
 	grep -i "^[${words_learnt}]\{1,\}$" /usr/share/dict/words | sort -i | uniq -i | sort -R | head -n 777 > $WORD_BUFFER_FILE
-	
+
 	for word in $(cat $WORD_BUFFER_FILE); do
 		if [[ ( ${#numeric_keys[@]} -eq 0 ) && ( ${#special_keys[@]} -eq 0 ) ]]; then
 			echo "${word^^}" >> $WORD_LIST_FILE
@@ -45,7 +45,7 @@ main () {
 				   # Sample: "123 !Potato@" "7 ^meat("
 				   # Group command follows:
 				   { echo -n $(get_random_number "${numeric_keys[@]}") "";
-				     echo -n "${special_keys[$(get_random_index "${special_keys[@]}")]}"; 
+				     echo -n "${special_keys[$(get_random_index "${special_keys[@]}")]}";
 					 echo -n "${word^^}";
 				     echo "${special_keys[$(get_random_index "${special_keys[@]}")]}";
 				   } >> $WORD_LIST_FILE
@@ -61,7 +61,7 @@ main () {
 				   # Sample: '12 seashore@' '983 potato!'
 				   { echo -n $(get_random_number "${numeric_keys[@]}") "";
 					 echo "${word^^}${special_keys[$(get_random_index "${special_keys[@]}")]}";
-				   } >> $WORD_LIST_FILE	
+				   } >> $WORD_LIST_FILE
 				   ;;
 				4) # Frequent one(s)
 				   if [[ "${special_keys[@]}" =~ ,. ]]; then
@@ -74,14 +74,14 @@ main () {
 						  echo "${word^^}"; } >> $WORD_LIST_FILE
 				   fi
 				   ;;
-				5) # Most common one 
+				5) # Most common one
 				   # Sample: 'animal' 'bird' 'cat'
 				   echo "${word^^}" >> $WORD_LIST_FILE
 				   ;;
 			esac
 			# prefix: number - single digit <---> postfix: punctuation/special mark - one at a time
 			# Have 4 switches here: 1. just word 2. num-word 3. word-special_mark 4. num-word-special_mark
-			# To select the number: get random index from the numeric_keys array: $RANDOM%${#numeric_keys[@]}  
+			# To select the number: get random index from the numeric_keys array: $RANDOM%${#numeric_keys[@]}
 			# To select the special_key: $RANDOM%${#special_keys[@]}
 			# Have another 5th switch to make up sentence-like thingies. num-word-char-space-word-period
 			# The 5th switch should be the rarest
@@ -106,6 +106,9 @@ while [[ -n $1 ]]; do
 	case $1 in
 		-h | --help )						usage
 											exit
+											;;
+		-u | --user-name )					shift
+											user_name=$1
 											;;
 		$(echo $1 | grep [[:alpha:]]) )		alpha_keys+=$(echo $1 | grep --only-matching [[:alpha:]] | tr -d '\n')
 											words_learnt=$(echo $alpha_keys | grep -o . | sort -i | uniq -i | tr -d '\n')
