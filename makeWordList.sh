@@ -10,6 +10,16 @@ WORD_LIST_FILE=$(mktemp /tmp/${SCRIPT_NAME%%.*}-wordList.$$.XXXXX.txt)
 
 usage () {
 	echo "$SCRIPT_NAME: usage: $SCRIPT_NAME ALPHABETIC-KEYS [NON-ALPHABETIC-KEYS]"
+	echo "Create custom Tuxtype levels outof the keys that you have learned"
+	echo
+	cat <<- __EOF__
+		Available Options:
+		-h, --help				Display this help and exit
+		-u, --user-name USER_NAME_STRING	Set the username to be USER_NAME_STRING
+	                                        This will be displayed in Tuxtype
+
+		For newer version of this script: https://github.com/peanutbutterandcrackers/tuxtype-make-wordlist
+	__EOF__
 	return
 }
 
