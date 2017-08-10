@@ -8,24 +8,9 @@ SCRIPT_NAME=$(basename $0)
 WORD_BUFFER_FILE=$(mktemp /tmp/${SCRIPT_NAME%%.*}-words.$$.XXXXX.txt)
 WORD_LIST_FILE=$(mktemp /tmp/${SCRIPT_NAME%%.*}-wordList.$$.XXXXX.txt)
 
-#########################################################################
-words_learnt=$(echo $1 | egrep -o . | sort | uniq | tr -d '\n')
-non_alpha_keys_learnt=$(echo $2)
-
-declare -a numeric_keys
-readarray -t numeric_keys < <(echo $2 | tr -c -d [:digit:] | egrep -o . | sort | uniq)
-[[ "$2" =~ \" ]] && auto_add=\'
-declare -a special_keys
-readarray -t special_keys < <(echo $2 $auto_add | tr -d [:digit:][:space:] | egrep -o . | sort | uniq)
-##########################################################################
-
 usage () {
-	echo "$SCRIPT_NAME: usage: $SCRIPT_NAME Alphabetic_keys [ Non-Alphabetic_Keys ]"
+	echo "$SCRIPT_NAME: usage: $SCRIPT_NAME ALPHABETIC-KEYS [NON-ALPHABETIC-KEYS]"
 	return
-}
-
-cli_arg_parser () {
-	echo "Not yet ready!"
 }
 
 get_random_number () {
@@ -49,7 +34,8 @@ get_random_index () {
 main () {
 	echo "$USER [Keys: ${words_learnt^^} ${numeric_keys[@]} ${special_keys[@]}]" > $WORD_LIST_FILE
 	
-	egrep -i "^[${words_learnt}]{1,}$" /usr/share/dict/words | sort -i | uniq -i | sort -R | head -n 777 > $WORD_BUFFER_FILE
+	grep -i "^[${words_learnt}]\{1,\}$" /usr/share/dict/words | sort -i | uniq -i | sort -R | head -n 777 > $WORD_BUFFER_FILE
+	
 	for word in $(cat $WORD_BUFFER_FILE); do
 		if [ ${#non_alpha_keys_learnt} -eq 0 ]; then
 			echo "${word^^}" >> $WORD_LIST_FILE
@@ -104,10 +90,37 @@ main () {
 		fi
 		word_buffer=$word # preserves 'another word' for case 4a
 	done
-
+	
 	rm $WORD_BUFFER_FILE
 	[[ -d ~/.tuxtype/words ]] || mkdir -p ~/.tuxtype/words
 	mv $WORD_LIST_FILE ~/.tuxtype/words/wordList_${BUILD_DATE}.txt
 }
+
+# Parse Command Line Arguments
+if [[ -z "$1" ]]; then
+	usage >&2
+	exit 1
+fi
+
+while [[ -n $1 ]]; do
+	case $1 in
+		-h | --help )						usage
+											exit
+											;;
+		$(echo $1 | grep [[:alpha:]]) )		alpha_keys=$(echo $1 | grep --only-matching [[:alpha:]] | tr -d '\n')
+											words_learnt=$(echo $alpha_keys | grep -o . | sort -i | uniq -i | tr -d '\n')
+											;;
+		$(echo $1 | grep [[:digit:]]) )		numeric_matches=$(echo $1 | grep --only-matching [[:digit:]] | tr -d '\n')
+											declare -a numeric_keys
+											readarray -t numeric_keys < <(echo $numeric_matches | grep -o . | sort | uniq)
+											;;
+		$(echo $1 | grep [[:punct:]]) )		special_matches=$(echo $1 | grep --only-matching [[:punct:]] | tr -d '\n')
+											[[ "$special_matches" =~ \" ]] && auto_add=\'
+											declare -a special_keys
+											readarray -t special_keys < <(echo $special_matches $auto_add | grep -o . | sort | uniq)
+											;;
+	esac
+	shift
+done
 
 main
