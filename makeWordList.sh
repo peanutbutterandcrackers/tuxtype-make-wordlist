@@ -107,13 +107,14 @@ while [[ -n $1 ]]; do
 		-h | --help )						usage
 											exit
 											;;
-		$(echo $1 | grep [[:alpha:]]) )		alpha_keys=$(echo $1 | grep --only-matching [[:alpha:]] | tr -d '\n')
+		$(echo $1 | grep [[:alpha:]]) )		alpha_keys+=$(echo $1 | grep --only-matching [[:alpha:]] | tr -d '\n')
 											words_learnt=$(echo $alpha_keys | grep -o . | sort -i | uniq -i | tr -d '\n')
 											;;&
-		$(echo $1 | grep [[:digit:]]) )		declare -a numeric_keys
-											readarray -t numeric_keys < <(echo $1 | tr -c -d [:digit:] | grep -o . | sort | uniq)
+		$(echo $1 | grep [[:digit:]]) )		numeric_matches+=$(echo $1 | grep --only-matching [[:digit:]] | tr -d '\n')
+											declare -a numeric_keys
+											readarray -t numeric_keys < <(echo $numeric_matches | tr -c -d [:digit:] | grep -o . | sort | uniq)
 											;;&
-		$(echo $1 | grep [[:punct:]]) )		special_matches=$(echo $1 | grep --only-matching [[:punct:]] | tr -d '\n')
+		$(echo $1 | grep [[:punct:]]) )		special_matches+=$(echo $1 | grep --only-matching [[:punct:]] | tr -d '\n')
 											[[ "$special_matches" =~ \" ]] && auto_add=\'
 											declare -a special_keys
 											readarray -t special_keys < <(echo $special_matches $auto_add | grep -o . | sort | uniq)
