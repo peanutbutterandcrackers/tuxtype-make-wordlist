@@ -37,7 +37,7 @@ main () {
 	grep -i "^[${words_learnt}]\{1,\}$" /usr/share/dict/words | sort -i | uniq -i | sort -R | head -n 777 > $WORD_BUFFER_FILE
 	
 	for word in $(cat $WORD_BUFFER_FILE); do
-		if [ ${#non_alpha_keys_learnt} -eq 0 ]; then
+		if [[ ( ${#numeric_keys[@]} -eq 0 ) && ( ${#special_keys[@]} -eq 0 ) ]]; then
 			echo "${word^^}" >> $WORD_LIST_FILE
 		else
 			case $((($RANDOM % 5) + 1)) in
@@ -109,11 +109,10 @@ while [[ -n $1 ]]; do
 											;;
 		$(echo $1 | grep [[:alpha:]]) )		alpha_keys=$(echo $1 | grep --only-matching [[:alpha:]] | tr -d '\n')
 											words_learnt=$(echo $alpha_keys | grep -o . | sort -i | uniq -i | tr -d '\n')
-											;;
-		$(echo $1 | grep [[:digit:]]) )		numeric_matches=$(echo $1 | grep --only-matching [[:digit:]] | tr -d '\n')
-											declare -a numeric_keys
-											readarray -t numeric_keys < <(echo $numeric_matches | grep -o . | sort | uniq)
-											;;
+											;;&
+		$(echo $1 | grep [[:digit:]]) )		declare -a numeric_keys
+											readarray -t numeric_keys < <(echo $1 | tr -c -d [:digit:] | grep -o . | sort | uniq)
+											;;&
 		$(echo $1 | grep [[:punct:]]) )		special_matches=$(echo $1 | grep --only-matching [[:punct:]] | tr -d '\n')
 											[[ "$special_matches" =~ \" ]] && auto_add=\'
 											declare -a special_keys
