@@ -90,7 +90,7 @@ main () {
 		fi
 		word_buffer=$word # preserves 'another word' for case 4a
 	done
-	
+
 	rm $WORD_BUFFER_FILE
 	[[ -d ~/.tuxtype/words ]] || mkdir -p ~/.tuxtype/words
 	mv $WORD_LIST_FILE ~/.tuxtype/words/wordList_${BUILD_DATE}.txt
