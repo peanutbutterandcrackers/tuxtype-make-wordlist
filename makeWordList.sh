@@ -19,6 +19,15 @@ declare -a special_keys
 readarray -t special_keys < <(echo $2 $auto_add | tr -d [:digit:][:space:] | egrep -o . | sort | uniq)
 ##########################################################################
 
+usage () {
+	echo "$SCRIPT_NAME: usage: $SCRIPT_NAME Alphabetic_keys [ Non-Alphabetic_Keys ]"
+	return
+}
+
+cli_arg_parser () {
+	echo "Not yet ready!"
+}
+
 get_random_number () {
 	arr=("$@")
 	maxdigits=$((RANDOM%3+1))
