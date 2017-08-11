@@ -44,7 +44,7 @@ get_random_index () {
 main () {
 	echo "${user_name:-$USER} [Keys: ${words_learnt^^} ${numeric_keys[@]} ${special_keys[@]}]" > $WORD_LIST_FILE
 
-	grep -i "^[${words_learnt}]\{1,\}$" /usr/share/dict/words | sort -i | uniq -i | sort -R | head -n 777 > $WORD_BUFFER_FILE
+	grep -i "^[${words_learnt}]\{1,\}$" /usr/share/dict/words | sort --ignore-case | uniq --ignore-case | sort -R | head -n 777 > $WORD_BUFFER_FILE
 
 	for word in $(cat $WORD_BUFFER_FILE); do
 		if [[ ( ${#numeric_keys[@]} -eq 0 ) && ( ${#special_keys[@]} -eq 0 ) ]]; then
@@ -97,8 +97,8 @@ main () {
 			# The 5th switch should be the rarest
 			# 4th switch, 3rd and 2nd should go hand in hand and should be the most common
 			# 1 should be rare too
+			word_buffer=$word # preserves 'another word' for case 4a
 		fi
-		word_buffer=$word # preserves 'another word' for case 4a
 	done
 
 	rm $WORD_BUFFER_FILE
