@@ -11,7 +11,7 @@ WORD_LIST_FILE=$(mktemp /tmp/${SCRIPT_NAME%%.*}-wordList.$$.XXXXX.txt)
 usage () {
 	echo "$SCRIPT_NAME: usage: $SCRIPT_NAME [OPTIONS] ALPHABETIC-KEYS [NON-ALPHABETIC-KEYS]"
 	echo
-	echo "Create custom Tuxtype levels outof the keys that you have learned"
+	echo "Create custom Tuxtype levels out of the keys that you have learned"
 	echo
 	cat <<- __EOF__
 		Available Options:
