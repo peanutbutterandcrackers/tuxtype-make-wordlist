@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export LC_ALL=C # Disables Unicode Support for performance gain
-trap "rm $WORD_BUFFER_FILE $WORD_LIST_FILE && exit 1" SIGINT SIGTERM # trap, to handle premature termination
+trap "rm $WORD_BUFFER_FILE $WORD_LIST_FILE && exit 1" SIGINT SIGTERM
 
 BUILD_DATE=$(date +%F_%T)
 SCRIPT_NAME=$(basename $0)
@@ -51,8 +51,7 @@ main () {
 			echo "${word^^}" >> $WORD_LIST_FILE
 		else
 			case $((($RANDOM % 5) + 1)) in
-				1) # The rarest one
-				   # Sample: "123 !Potato@" "7 ^meat("
+				1) # Sample: "123 !Potato@" "7 ^meat("
 				   # Group command follows:
 				   { echo -n $(get_random_number "${numeric_keys[@]}") "";
 				     echo -n "${special_keys[$(get_random_index "${special_keys[@]}")]}";
@@ -60,21 +59,17 @@ main () {
 				     echo "${special_keys[$(get_random_index "${special_keys[@]}")]}";
 				   } >> $WORD_LIST_FILE
 				   ;;
-				2) # The 2nd-to-rarest one
-				   # Sample: '12 animal' '123 word'
-				   # Group command follows, again:
+				2) # Sample: '12 animal' '123 word'
 				   { echo -n $(get_random_number "${numeric_keys[@]}") "";
 					 echo "${word^^}";
 				   } >> $WORD_LIST_FILE
 				   ;;
-				3) # The 3rd-to-rarest one
-				   # Sample: '12 seashore@' '983 potato!'
+				3) # Sample: '12 seashore@' '983 potato!'
 				   { echo -n $(get_random_number "${numeric_keys[@]}") "";
 					 echo "${word^^}${special_keys[$(get_random_index "${special_keys[@]}")]}";
 				   } >> $WORD_LIST_FILE
 				   ;;
-				4) # Frequent one(s)
-				   if [[ "${special_keys[@]}" =~ ,. ]]; then
+				4) if [[ "${special_keys[@]}" =~ ,. ]]; then
 				   		# Sample: "animal, potato, cauliflower."
 				   		{ echo -n "${word^^}, ";
 						  echo "${word_buffer^^}."; } >> $WORD_LIST_FILE
@@ -84,19 +79,10 @@ main () {
 						  echo "${word^^}"; } >> $WORD_LIST_FILE
 				   fi
 				   ;;
-				5) # Most common one
-				   # Sample: 'animal' 'bird' 'cat'
+				5) # Sample: 'animal' 'bird' 'cat'
 				   echo "${word^^}" >> $WORD_LIST_FILE
 				   ;;
 			esac
-			# prefix: number - single digit <---> postfix: punctuation/special mark - one at a time
-			# Have 4 switches here: 1. just word 2. num-word 3. word-special_mark 4. num-word-special_mark
-			# To select the number: get random index from the numeric_keys array: $RANDOM%${#numeric_keys[@]}
-			# To select the special_key: $RANDOM%${#special_keys[@]}
-			# Have another 5th switch to make up sentence-like thingies. num-word-char-space-word-period
-			# The 5th switch should be the rarest
-			# 4th switch, 3rd and 2nd should go hand in hand and should be the most common
-			# 1 should be rare too
 			word_buffer=$word # preserves 'another word' for case 4a
 		fi
 	done
