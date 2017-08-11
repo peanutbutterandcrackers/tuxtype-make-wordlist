@@ -32,9 +32,9 @@ usage () {
 }
 
 get_random_number () {
-	arr=("$@")
-	maxdigits=$((RANDOM%3+1))
-	jumbled=($(for i in "${arr[@]}"; do
+	local arr=("$@")
+	local maxdigits=$((RANDOM%3+1))
+	local jumbled=($(for i in "${arr[@]}"; do
 				echo $i
 			done | sort -R | sort -R))
 	echo "${jumbled[@]:0:$maxdigits}" | tr -d ' '
@@ -42,9 +42,9 @@ get_random_number () {
 	}
 
 get_random_index () {
-	arr=("$@")
-	arr_len=${#arr[@]}
-	index=$((RANDOM%$arr_len))
+	local arr=("$@")
+	local arr_len=${#arr[@]}
+	local index=$((RANDOM%$arr_len))
 	echo $index
 	return
 	}
