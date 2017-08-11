@@ -37,7 +37,7 @@ get_random_number () {
 	local jumbled=($(for i in "${arr[@]}"; do
 				echo $i
 			done | sort -R | sort -R))
-	echo "${jumbled[@]:0:$maxdigits}" | tr -d ' '
+	echo "${jumbled[@]:0:$maxdigits}" | tr -d [:space:]
 	return
 	}
 
