@@ -9,16 +9,24 @@ WORD_BUFFER_FILE=$(mktemp /tmp/${SCRIPT_NAME%%.*}-words.$$.XXXXX.txt)
 WORD_LIST_FILE=$(mktemp /tmp/${SCRIPT_NAME%%.*}-wordList.$$.XXXXX.txt)
 
 usage () {
-	echo "$SCRIPT_NAME: usage: $SCRIPT_NAME ALPHABETIC-KEYS [NON-ALPHABETIC-KEYS]"
+	echo "$SCRIPT_NAME: usage: $SCRIPT_NAME [OPTIONS] ALPHABETIC-KEYS [NON-ALPHABETIC-KEYS]"
+	echo
 	echo "Create custom Tuxtype levels outof the keys that you have learned"
 	echo
 	cat <<- __EOF__
 		Available Options:
-		-h, --help				Display this help and exit
-		-u, --user-name USER_NAME_STRING	Set the username to be USER_NAME_STRING
-	                                        This will be displayed in Tuxtype
+		-h, --help				->Display this help and exit
+		-u, --user-name USER_NAME_STRING	->Set the username to be USER_NAME_STRING
+	                                          This will be displayed in Tuxtype as the name of the lesson.
+		--no-filter				->Disables word-filter that is activated by default. Disabling this
+	                                          does give significant reduction in execution time; however, inappropriate
+                       			  words might slip in to the final word list. Use wisely.
+		--max-words INTEGER			->Sets the maximum word generation limit for the script. Default is 175. Higher values
+		              				  increase the execution time. Decrease the value for faster generation on slower machines.
 
-		For newer version of this script: https://github.com/peanutbutterandcrackers/tuxtype-make-wordlist
+		Make Sure the NON-ALPHABETIC-KEYS are enclosed with single quotes, like so: '$@#-+/'
+
+		There's No Place Like Home: https://github.com/peanutbutterandcrackers/tuxtype-make-wordlist
 	__EOF__
 	return
 }
@@ -54,10 +62,12 @@ is_inappropriate_word () {
 main () {
 	echo "${user_name:-$USER} [Keys: ${words_learnt^^} ${numeric_keys[@]} ${special_keys[@]}]" > $WORD_LIST_FILE
 
-	grep -i "^[${words_learnt}]\{1,\}$" /usr/share/dict/words | sort --ignore-case | uniq --ignore-case | sort -R | head -n 175 > $WORD_BUFFER_FILE
+	grep -i "^[${words_learnt}]\{1,\}$" /usr/share/dict/words | sort --ignore-case | uniq --ignore-case | sort -R | head -n ${max_words:-175} > $WORD_BUFFER_FILE
 
 	for word in $(cat $WORD_BUFFER_FILE); do
-		is_inappropriate_word $word && continue
+		if [[ -z $filter ]]; then
+			is_inappropriate_word $word && continue
+		fi
 
 		if [[ ( ${#numeric_keys[@]} -eq 0 ) && ( ${#special_keys[@]} -eq 0 ) ]]; then
 			echo "${word^^}" >> $WORD_LIST_FILE
@@ -117,6 +127,11 @@ while [[ -n $1 ]]; do
 											;;
 		-u | --user-name )					shift
 											user_name=$1
+											;;
+		--no-filter )						filter='off'
+											;;
+		--max-words )						shift
+											max_words=$1
 											;;
 		$(echo $1 | grep [[:alpha:]]) )		alpha_keys+=$(echo $1 | grep --only-matching [[:alpha:]] | tr -d '\n')
 											words_learnt=$(echo $alpha_keys | grep -o . | sort -i | uniq -i | tr -d '\n')
