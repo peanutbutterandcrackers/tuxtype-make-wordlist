@@ -41,12 +41,24 @@ get_random_index () {
 	return
 	}
 
+is_inappropriate_word () {
+	# an attempt to prevent inappropriate words from slipping in to the final worlist
+	# because some were slipping in, at times
+	inapprop_regex=( f.c. s.it a[s]{2} s.x )
+	for inapprop in "${inapprop_regex[@]}"; do
+		grep -E --silent --ignore-case $inapprop <<< "$1" && break
+	done
+	return
+}
+
 main () {
 	echo "${user_name:-$USER} [Keys: ${words_learnt^^} ${numeric_keys[@]} ${special_keys[@]}]" > $WORD_LIST_FILE
 
-	grep -i "^[${words_learnt}]\{1,\}$" /usr/share/dict/words | sort --ignore-case | uniq --ignore-case | sort -R | head -n 777 > $WORD_BUFFER_FILE
+	grep -i "^[${words_learnt}]\{1,\}$" /usr/share/dict/words | sort --ignore-case | uniq --ignore-case | sort -R | head -n 200 > $WORD_BUFFER_FILE
 
 	for word in $(cat $WORD_BUFFER_FILE); do
+		is_inappropriate_word $word && continue
+
 		if [[ ( ${#numeric_keys[@]} -eq 0 ) && ( ${#special_keys[@]} -eq 0 ) ]]; then
 			echo "${word^^}" >> $WORD_LIST_FILE
 		else
