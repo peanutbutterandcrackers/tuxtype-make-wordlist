@@ -20,7 +20,7 @@ stuff that shows up?), go to the next page using the arrow at the bottom and you
 word list file with the name **$USER [Keys: *keys_you_have_learned*]** where *$USER* is your username.
 
 The script goes through the file
-*/usr/share/dict/words* and *grep*-s all the words made from only the selected letters and create a
+*/usr/share/dict/words*, *grep*-s all the words made from only the selected letters, creates a
 word list file (the level file) out of it, and copies that to *~/.tuxtype/words*.
 
 ```$ bash makeWordList.sh --help # for more available options```
