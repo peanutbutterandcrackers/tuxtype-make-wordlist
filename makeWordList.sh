@@ -108,6 +108,7 @@ main () {
 		if [[ ( ${#numeric_keys[@]} -eq 0 ) && ( ${#special_keys[@]} -eq 0 ) ]]; then
 			echo "${word^^}" >> $WORD_LIST_FILE
 		else
+			[[ "${#special_keys[@]}" -eq 0 ]] && special_keys+=('')
 			case $((($RANDOM % 5) + 1)) in
 				1) # Sample: "123 !Potato@" "7 ^meat("
 				   # Group command follows:
