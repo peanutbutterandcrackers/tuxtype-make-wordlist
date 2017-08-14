@@ -16,6 +16,7 @@ usage () {
 	cat <<- _EOF_
 		Available Options:
 		-h, --help				->Display this help and exit
+		-i, --interactive			->Interactive Mode. Specify at the end to use with other options.
 		-u, --user-name USER_NAME_STRING	->Set the username to be USER_NAME_STRING
 		                                          This will be displayed in Tuxtype as the name of the lesson.
 		--no-filter				->Disables word-filter that is activated by default. Disabling this
@@ -59,6 +60,37 @@ is_inappropriate_word () {
 	inapprop_rot1+=( tfy ) # Verbs
 	grep -E --silent --ignore-case "$(echo ${inapprop_rot1[*]} | tr ' ' '|')" <<< "$(echo $1 | tr a-z b-za)"
 	return
+}
+
+interactive () {
+	while [[ -z $alphas ]]; do
+		read -p "Enter the alphabetic keys (letters) that you have learned [REQUIRED] > " alphas
+		alphas=$(echo $alphas | tr -d -c [:alpha:])
+	done
+	words_learnt=$(echo $alphas | grep -o . | sort --ignore-case | uniq -i | tr -d '\n')
+	echo $words_learnt
+
+	echo -n "Enter the numeric keys that you have learned, if any > "
+	read numerics
+	numerics=$(echo $numerics | tr -d -c [:digit:])
+	declare -g -a numeric_keys
+	readarray -t numeric_keys < <(echo $numerics | tr -c -d [:digit:] | grep -o . | sort | uniq)
+	echo "${numeric_keys[@]}"
+
+	echo -n "Enter the special keys (punctuations) that you have learned, if any > "
+	read -r specials
+	specials=$(echo $specials | tr -d -c [:punct:])
+	declare -g -a special_keys
+	readarray -t special_keys < <(echo $specials | grep -o . | sort | uniq)
+	echo "${special_keys[@]}"
+
+	if [[ -z $user_name ]]; then
+		echo -n "Enter your name [OPTIONAL] > "
+		read user_name
+		[[ -n $user_name ]] && echo "$user_name"
+	fi
+
+	echo "Generating word list. Please wait."
 }
 
 main () {
@@ -127,6 +159,9 @@ while [[ -n $1 ]]; do
 		-h | --help )						usage
 											exit
 											;;
+		-i | --interactive )				interact=1
+											break
+											;;
 		-u | --user-name )					shift
 											user_name=$1
 											;;
@@ -151,4 +186,8 @@ while [[ -n $1 ]]; do
 	shift
 done
 
+[[ $interact == 1 ]] && interactive
+
 main
+
+[[ $interact == 1 ]] && echo "Generation complete."
