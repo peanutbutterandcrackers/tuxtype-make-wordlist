@@ -19,7 +19,7 @@ usage () {
 		-u, --user-name USER_NAME_STRING	->Set the username to be USER_NAME_STRING
 		                                          This will be displayed in Tuxtype as the name of the lesson.
 		--no-filter				->Disables word-filter that is activated by default. Disabling this
-		                                          does give significant reduction in execution time; however, inappropriate
+		                                          does give a bit of reduction in execution time; however, inappropriate
 		                                          words might slip in to the final word list. Use wisely.
 		--max-words INTEGER			->Sets the maximum word generation limit for the script. Default is 175. Higher values
 		                                          increase the execution time. Decrease the value for faster generation on slower machines.
