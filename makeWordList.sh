@@ -91,6 +91,8 @@ interactive () {
 	fi
 
 	echo "Generating word list. Please wait."
+	main
+	echo "Generation Complete."
 }
 
 main () {
@@ -159,7 +161,7 @@ while [[ -n $1 ]]; do
 		-h | --help )						usage
 											exit
 											;;
-		-i | --interactive )				interact=1
+		-i | --interactive )				interactive_mode=1
 											break
 											;;
 		-u | --user-name )					shift
@@ -186,8 +188,6 @@ while [[ -n $1 ]]; do
 	shift
 done
 
-[[ $interact == 1 ]] && interactive
+[[ $interactive_mode == 1 ]] && interactive && exit
 
 main
-
-[[ $interact == 1 ]] && echo "Generation complete."
