@@ -13,21 +13,21 @@ usage () {
 	echo
 	echo "Create custom Tuxtype levels out of the keys that you have learned"
 	echo
-	cat <<- __EOF__
+	cat <<- _EOF_
 		Available Options:
 		-h, --help				->Display this help and exit
 		-u, --user-name USER_NAME_STRING	->Set the username to be USER_NAME_STRING
-	                                          This will be displayed in Tuxtype as the name of the lesson.
+		                                          This will be displayed in Tuxtype as the name of the lesson.
 		--no-filter				->Disables word-filter that is activated by default. Disabling this
-	                                          does give significant reduction in execution time; however, inappropriate
-                       			  words might slip in to the final word list. Use wisely.
+		                                          does give significant reduction in execution time; however, inappropriate
+		                                          words might slip in to the final word list. Use wisely.
 		--max-words INTEGER			->Sets the maximum word generation limit for the script. Default is 175. Higher values
-		              				  increase the execution time. Decrease the value for faster generation on slower machines.
+		                                          increase the execution time. Decrease the value for faster generation on slower machines.
 
 		Make Sure the NON-ALPHABETIC-KEYS are enclosed with single quotes, like so: '$@#-+/'
 
 		There's No Place Like Home: https://github.com/peanutbutterandcrackers/tuxtype-make-wordlist
-	__EOF__
+	_EOF_
 	return
 }
 
