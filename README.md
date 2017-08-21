@@ -41,6 +41,10 @@ And that's it!
 Hope you have a lot of fun! :+1: :v:
 
 ### P. S:
-Use ``gtypist`` to learn how to touch type - ```sudo apt install gtypist``` - and this script to generate the word list from the keys you have just learned to practice on ```tuxtype```, that way, you'll have cemented your knowledge very well before moving on to next lesson in ```gtypist```. But make sure you do not over-play/over-cement your knowledge. You wouldn't want your typing to be fast for a certain set of keys and slower for the next set - esp. while learning. Trust me.
+Use ``gtypist`` to learn how to touch type - ```sudo apt install gtypist``` - and this script to generate the
+word list from the keys you have just learned to practice on ```tuxtype```. That way you'll have cemented your 
+knowledge very well before moving on to next lesson in ```gtypist```. But make sure you do not over-play/over-cement
+your knowledge. You wouldn't want your typing to be fast for a certain set of keys and slower for the next set - esp.
+while learning. Trust me.
 
 ![Adding this picture of baby Tux because he's so cute (and I need to learn markdown)](https://www.gnu.org/graphics/babies/BabyTuxAlpha.png)
