@@ -34,7 +34,9 @@ global_install () {
 	# will reside in /usr/local/bin
 	# requires superuser privileges
 	if [ $(id -u) -eq 0 ]; then
-		cp -a $(dirname $0)/makeWordList.sh /usr/local/bin/tuxtype-make-wordlist
+		cp $(dirname $0)/makeWordList.sh /usr/local/bin/tuxtype-make-wordlist
+		chmod 755 /usr/local/bin/tuxtype-make-wordlist
+		chown root: /usr/local/bin/tuxtype-make-wordlist
 		[[ $? -eq 0 ]] && echo "Global Installation successful."
 	else
 		echo "Error: Requires Super User Privileges for global installation."
