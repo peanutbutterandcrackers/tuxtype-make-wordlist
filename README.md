@@ -34,6 +34,8 @@ $ bash INSTALL.sh
 ```shellscript
 $ sudo bash INSTALL.sh --global
 ```
+Once you Install the script, you can call it directly, like so:
+```tuxtype-make-wordlist --interactive``` from the terminal.
 
 And that's it!
 Hope you have a lot of fun! :+1: :v:
