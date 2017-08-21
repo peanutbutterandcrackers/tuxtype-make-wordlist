@@ -1,11 +1,11 @@
 #!/bin/bash
 
-help () {
+usage () {
 	cat <<- _EOF_
-		Installation Help: tuxtype-make-wordlist
-		-h, --help -> Display this help and exit
+		tuxtype-make-wordlist installation script: usage: INSTALL.sh [-h|-g|-l]
+		-h, --help   -> Display this help and exit
 		-g, --global -> Install globally, requires super-user privileges
-		-l, --local -> Install locally, doesn't require elevated privileges
+		-l, --local  -> Install locally, doesn't require elevated privileges
 	_EOF_
 }
 
@@ -53,7 +53,7 @@ fi
 
 while [[ -n "$1" ]]; do
 	case $1 in 
-		-h | --help )	help
+		-h | --help )	usage
 		            	exit
 						;;
 		-g | --global )	global_install
@@ -62,7 +62,7 @@ while [[ -n "$1" ]]; do
 		-l | --local )	local_install
 		                exit
 						;;
-		* )             help
+		* )            	usage
 		                exit 1
 	esac			
 	shift
