@@ -56,7 +56,7 @@ is_inappropriate_word () {
 	declare -a inapprop_rot1 # ROT1 encoded array of inappropriate words
 	inapprop_rot1=( gvdl tiju dvou ) # Curse Words
 	inapprop_rot1+=( btt cppc csfbtu qfojt wbhjob ) # Body Parts
-	inapprop_rot1+=( epvdif ejdl ) # Insults
+	inapprop_rot1+=( epvdif ejdl gbh tmvu cjudi ) # Insults
 	inapprop_rot1+=( tfy ) # Verbs
 	grep -E --silent --ignore-case "$(echo ${inapprop_rot1[*]} | tr ' ' '|')" <<< "$(echo $1 | tr a-z b-za)"
 	return
