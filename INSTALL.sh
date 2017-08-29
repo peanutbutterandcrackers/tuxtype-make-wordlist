@@ -47,7 +47,7 @@ global_install () {
 }
 
 if [[ -z "$1" ]]; then
-	local_install
+	usage
 	exit
 fi
 
