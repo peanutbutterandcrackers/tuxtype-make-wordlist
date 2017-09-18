@@ -33,8 +33,10 @@ usage () {
 }
 
 get_random_number () {
+	# get a N-(or-less)-digit random number from the given array of digits
+	local N=3
 	local arr=("$@")
-	local maxdigits=$((RANDOM%3+1))
+	local maxdigits=$((RANDOM%$N+1))
 	local jumbled=($(for i in "${arr[@]}"; do
 				echo $i
 			done | sort -R))
@@ -43,6 +45,7 @@ get_random_number () {
 	}
 
 get_random_index () {
+	# from the given array, return a random index (based on the array's length)
 	local arr=("$@")
 	local arr_len=${#arr[@]}
 	local index=$((RANDOM%$arr_len))
@@ -67,8 +70,8 @@ interactive () {
 		read -p "Enter the alphabetic keys (letters) that you have learned [REQUIRED] > " alphas
 		alphas=$(echo $alphas | tr -d -c [:alpha:])
 	done
-	words_learnt=$(echo $alphas | grep -o . | sort --ignore-case | uniq -i | tr -d '\n')
-	echo $words_learnt
+	letters_learnt=$(echo $alphas | grep -o . | sort --ignore-case | uniq -i | tr -d '\n')
+	echo $letters_learnt
 
 	echo -n "Enter the numeric keys that you have learned, if any > "
 	read numerics
@@ -96,12 +99,12 @@ interactive () {
 }
 
 main () {
-	echo "${user_name:-$USER} [Keys: ${words_learnt^^} ${numeric_keys[@]} ${special_keys[@]}]" > $WORD_LIST_FILE
+	echo "${user_name:-$USER} [Keys: ${letters_learnt^^} ${numeric_keys[@]} ${special_keys[@]}]" > $WORD_LIST_FILE
 
-	grep -i "^[${words_learnt}]\{1,\}$" /usr/share/dict/words | sort --ignore-case | uniq --ignore-case | sort -R | head -n ${max_words:-175} > $WORD_BUFFER_FILE
+	grep -i "^[${letters_learnt}]\{1,\}$" /usr/share/dict/words | sort --ignore-case | uniq --ignore-case | sort -R | head -n ${max_words:-175} > $WORD_BUFFER_FILE
 
 	for word in $(cat $WORD_BUFFER_FILE); do
-		if [[ -z $filter ]]; then
+		if [[ $filter == 'off' ]]; then
 			is_inappropriate_word $word && continue
 		fi
 
@@ -174,7 +177,7 @@ while [[ -n $1 ]]; do
 											max_words=$1
 											;;
 		$(echo $1 | grep [[:alpha:]]) )		alpha_keys+=$(echo $1 | grep --only-matching [[:alpha:]] | tr -d '\n')
-											words_learnt=$(echo $alpha_keys | grep -o . | sort --ignore-case | uniq -i | tr -d '\n')
+											letters_learnt=$(echo $alpha_keys | grep -o . | sort --ignore-case | uniq -i | tr -d '\n')
 											;;&
 		$(echo $1 | grep [[:digit:]]) )		numeric_matches+=$(echo $1 | grep --only-matching [[:digit:]] | tr -d '\n')
 											declare -a numeric_keys
