@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -f
 
 export LC_ALL=C # Disables Unicode Support for performance gain
 BUILD_DATE=$(date +%F_%T)
@@ -64,23 +64,8 @@ get_random_elements () {
 	local jumbled=($(for i in "${array[@]}"; do echo $i; done | sort -R))
 	echo "${jumbled[@]:0:$number}" | sed "s/ /$delimiter/g"
 
-	##STUB##
-	# echo number: $number
-	# echo delimiter: $delimiter
-	# echo array: ${array[@]}
-	##STUB##
-
 	return
 }
-
-get_random_index () {
-	# from the given array, return a random index (based on the array's length)
-	local arr=("$@")
-	local arr_len=${#arr[@]}
-	local index=$((RANDOM%$arr_len))
-	echo $index
-	return
-	}
 
 is_inappropriate_word () {
 	# an attempt to prevent inappropriate words from slipping in to the final worlist
@@ -130,7 +115,8 @@ interactive () {
 main () {
 	echo "${user_name:-$USER} [Keys: ${letters_learnt^^} ${numeric_keys[@]} ${special_keys[@]}]" > $WORD_LIST_FILE
 
-	grep -i "^[${letters_learnt}]\{1,\}$" /usr/share/dict/words | sort --ignore-case | uniq --ignore-case | sort -R | head -n ${max_words:-175} > $WORD_BUFFER_FILE
+	grep -i "^[${letters_learnt}]\{1,\}$" /usr/share/dict/words | sort --ignore-case | uniq --ignore-case | sort -R \
+		| head -n ${max_words:-175} > $WORD_BUFFER_FILE
 
 	for word in $(cat $WORD_BUFFER_FILE); do
 		if [[ $filter != 'off' ]]; then
@@ -141,40 +127,14 @@ main () {
 			echo "${word^^}" >> $WORD_LIST_FILE
 		else
 			[[ "${#special_keys[@]}" -eq 0 ]] && special_keys+=('')
-			case $((($RANDOM % 5) + 1)) in
-				1) # Sample: "123 !Potato@" "7 ^meat("
-				   # Group command follows:
-				   { echo -n $(get_random_number "${numeric_keys[@]}") "";
-				     echo -n "${special_keys[$(get_random_index "${special_keys[@]}")]}";
-					 echo -n "${word^^}";
-				     echo "${special_keys[$(get_random_index "${special_keys[@]}")]}";
-				   } >> $WORD_LIST_FILE
-				   ;;
-				2) # Sample: '12 animal' '123 word'
-				   { echo -n $(get_random_number "${numeric_keys[@]}") "";
-					 echo "${word^^}";
-				   } >> $WORD_LIST_FILE
-				   ;;
-				3) # Sample: '12 seashore@' '983 potato!'
-				   { echo -n $(get_random_number "${numeric_keys[@]}") "";
-					 echo "${word^^}${special_keys[$(get_random_index "${special_keys[@]}")]}";
-				   } >> $WORD_LIST_FILE
-				   ;;
-				4) if [[ "${special_keys[@]}" =~ ,. ]]; then
-				   		# Sample: "animal, potato, cauliflower."
-				   		{ echo -n "${word^^}, ";
-						  echo "${word_buffer^^}."; } >> $WORD_LIST_FILE
-				   else
-				   		# Sample: '123 potato', '12 tomato'
-				   		{ echo -n $(get_random_number "${numeric_keys[@]}") "";
-						  echo "${word^^}"; } >> $WORD_LIST_FILE
-				   fi
-				   ;;
-				5) # Sample: 'animal' 'bird' 'cat'
-				   echo "${word^^}" >> $WORD_LIST_FILE
-				   ;;
-			esac
-			word_buffer=$word # preserves 'another word' for case 4a
+			str_arr=()
+			str_arr+=$(get_random_elements -n 3 "${numeric_keys[@]}")
+			str_arr+=$(get_random_elements -n 2 -d ' ' "${special_keys[@]}")
+			str_arr+=(${word^^})
+			[[ $(($RANDOM%7)) == 0 ]] && str_arr+=(${word_buffer^^})
+			jumbled_str_arr=($(for i in "${str_arr[@]}"; do echo $i; done | sort -R ))
+			echo "${jumbled_str_arr[@]}" | sed -r 's_([[:punct:]]) ([^[:punct:]])_\1\2_' | sed -r 's_([^[:punct:]]) ([[:punct:]])_\1\2_' >> $WORD_LIST_FILE
+			[[ $(($RANDOM%2)) == 0 ]] && word_buffer=$word
 		fi
 	done
 
@@ -183,44 +143,46 @@ main () {
 	mv $WORD_LIST_FILE ~/.tuxtype/words/wordList_${BUILD_DATE}.txt
 }
 
-# Parse Command Line Arguments
-if [[ -z "$1" ]]; then
-	usage >&2
-	exit 1
-fi
+parse_args () {
+	# Parse Command Line Arguments
+	if [[ -z "$1" ]]; then
+		usage >&2
+		exit 1
+	fi
+	
+	while [[ -n $1 ]]; do
+		case $1 in
+			-h | --help )						usage
+												exit
+												;;
+			-i | --interactive )				interactive_mode=1
+												break
+												;;
+			-u | --user-name )					shift
+												user_name=$1
+												;;
+			--no-filter )						filter='off'
+												;;
+			--max-words )						shift
+												max_words=$1
+												;;
+			$(echo $1 | grep [[:alpha:]]) )		alpha_keys+=$(echo $1 | grep --only-matching [[:alpha:]] | tr -d '\n')
+												letters_learnt=$(echo $alpha_keys | grep -o . | sort --ignore-case | uniq -i | tr -d '\n')
+												;;&
+			$(echo $1 | grep [[:digit:]]) )		numeric_matches+=$(echo $1 | grep --only-matching [[:digit:]] | tr -d '\n')
+												declare -ga numeric_keys
+												readarray -t numeric_keys < <(echo $numeric_matches | tr -c -d [:digit:] | grep -o . | sort | uniq)
+												;;&
+			$(echo $1 | grep [[:punct:]]) )		special_matches+=$(echo $1 | grep --only-matching [[:punct:]] | tr -d '\n')
+												[[ "$special_matches" =~ \" ]] && auto_add=\'
+												declare -ga special_keys
+												readarray -t special_keys < <(echo $special_matches $auto_add | grep -o . | sort | uniq)
+												;;
+		esac
+		shift
+	done
+}
 
-while [[ -n $1 ]]; do
-	case $1 in
-		-h | --help )						usage
-											exit
-											;;
-		-i | --interactive )				interactive_mode=1
-											break
-											;;
-		-u | --user-name )					shift
-											user_name=$1
-											;;
-		--no-filter )						filter='off'
-											;;
-		--max-words )						shift
-											max_words=$1
-											;;
-		$(echo $1 | grep [[:alpha:]]) )		alpha_keys+=$(echo $1 | grep --only-matching [[:alpha:]] | tr -d '\n')
-											letters_learnt=$(echo $alpha_keys | grep -o . | sort --ignore-case | uniq -i | tr -d '\n')
-											;;&
-		$(echo $1 | grep [[:digit:]]) )		numeric_matches+=$(echo $1 | grep --only-matching [[:digit:]] | tr -d '\n')
-											declare -a numeric_keys
-											readarray -t numeric_keys < <(echo $numeric_matches | tr -c -d [:digit:] | grep -o . | sort | uniq)
-											;;&
-		$(echo $1 | grep [[:punct:]]) )		special_matches+=$(echo $1 | grep --only-matching [[:punct:]] | tr -d '\n')
-											[[ "$special_matches" =~ \" ]] && auto_add=\'
-											declare -a special_keys
-											readarray -t special_keys < <(echo $special_matches $auto_add | grep -o . | sort | uniq)
-											;;
-	esac
-	shift
-done
-
+parse_args "$@"
 [[ $interactive_mode == 1 ]] && interactive && exit
-
 main
