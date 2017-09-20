@@ -1,12 +1,11 @@
 #!/bin/bash
 
 export LC_ALL=C # Disables Unicode Support for performance gain
-trap "rm $WORD_BUFFER_FILE $WORD_LIST_FILE && exit 1" SIGINT SIGTERM
-
 BUILD_DATE=$(date +%F_%T)
 SCRIPT_NAME=$(basename $0)
 WORD_BUFFER_FILE=$(mktemp /tmp/${SCRIPT_NAME%%.*}-words.$$.XXXXX.txt)
 WORD_LIST_FILE=$(mktemp /tmp/${SCRIPT_NAME%%.*}-wordList.$$.XXXXX.txt)
+trap "rm $WORD_BUFFER_FILE $WORD_LIST_FILE; echo; exit 1" SIGINT SIGTERM
 
 usage () {
 	echo "$SCRIPT_NAME: usage: $SCRIPT_NAME [OPTIONS] ALPHABETIC-KEYS [NON-ALPHABETIC-KEYS]"
