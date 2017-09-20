@@ -31,17 +31,47 @@ usage () {
 	return
 }
 
-get_random_number () {
-	# get a N-(or-less)-digit random number from the given array of digits
-	local N=3
-	local arr=("$@")
-	local maxdigits=$((RANDOM%$N+1))
-	local jumbled=($(for i in "${arr[@]}"; do
-				echo $i
-			done | sort -R))
-	echo "${jumbled[@]:0:$maxdigits}" | tr -d [:space:]
+get_random_elements () {
+	# from the given array, return random elements
+	#
+	# get_random_elements [OPTIONS] ARRAY
+	#
+	# Available Options:
+	# -n, --number=NUMBER
+	#     return NUMBER elements from the array
+	#     Default is 3
+	# -d, -- delimiter=DELIM
+	#     set delimiter to DELIM
+	#
+	declare -i number=3
+	declare delimiter=''
+	declare -a array
+
+	while [[ -n $1 ]]; do
+		case $1 in
+			-n | --number )	shift
+			              	number=$1
+							;;
+			-d | --delimiter )	shift
+			                 	delimiter=$1
+								;;
+			* )	array+=($1)
+				;;
+		esac
+		shift
+	done
+
+	local jumbled=($(for i in "${array[@]}"; do echo $i; done | sort -R))
+	echo "${jumbled[@]:0:$number}" | sed "s/ /$delimiter/g"
+
+	##STUB##
+	# echo number: $number
+	# echo delimiter: $delimiter
+	# echo array: ${array[@]}
+	##STUB##
+
 	return
-	}
+}
 
 get_random_index () {
 	# from the given array, return a random index (based on the array's length)
