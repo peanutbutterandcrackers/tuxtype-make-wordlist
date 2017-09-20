@@ -104,7 +104,7 @@ main () {
 	grep -i "^[${letters_learnt}]\{1,\}$" /usr/share/dict/words | sort --ignore-case | uniq --ignore-case | sort -R | head -n ${max_words:-175} > $WORD_BUFFER_FILE
 
 	for word in $(cat $WORD_BUFFER_FILE); do
-		if [[ $filter == 'off' ]]; then
+		if [[ $filter != 'off' ]]; then
 			is_inappropriate_word $word && continue
 		fi
 
