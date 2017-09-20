@@ -40,12 +40,17 @@ get_random_elements () {
 	# -n, --number=NUMBER
 	#     return NUMBER elements from the array
 	#     Default is 3
-	# -d, -- delimiter=DELIM
+	# -d, --delimiter=DELIM
 	#     set delimiter to DELIM
+	# -f, --fickle
+	#     turn on fickle mode
+	#     instead of returning NUMBER elements from the array, return any
+	#     no. of elements from 1 to NUMBER, at max.
 	#
 	declare -i number=3
 	declare delimiter=''
 	declare -a array
+	local fickle
 
 	while [[ -n $1 ]]; do
 		case $1 in
@@ -55,6 +60,8 @@ get_random_elements () {
 			-d | --delimiter )	shift
 			                 	delimiter=$1
 								;;
+			-f | --fickle )	fickle=true
+			              	;;
 			* )	array+=($1)
 				;;
 		esac
@@ -62,7 +69,11 @@ get_random_elements () {
 	done
 
 	local jumbled=($(for i in "${array[@]}"; do echo $i; done | sort -R))
-	echo "${jumbled[@]:0:$number}" | sed "s/ /$delimiter/g"
+	if [[ -n $fickle ]]; then
+		local max_digits=$number
+		number=$(($RANDOM%$max_digits))
+	fi
+		echo "${jumbled[@]:0:$number}" | sed "s/ /$delimiter/g"
 
 	return
 }
@@ -128,8 +139,8 @@ main () {
 		else
 			[[ "${#special_keys[@]}" -eq 0 ]] && special_keys+=('')
 			str_arr=()
-			str_arr+=$(get_random_elements -n 3 "${numeric_keys[@]}")
-			str_arr+=$(get_random_elements -n 2 -d ' ' "${special_keys[@]}")
+			str_arr+=$(get_random_elements -n 3 -f "${numeric_keys[@]}")
+			str_arr+=$(get_random_elements -n 2 -d ' ' -f "${special_keys[@]}")
 			str_arr+=(${word^^})
 			[[ $(($RANDOM%7)) == 0 ]] && str_arr+=(${word_buffer^^})
 			jumbled_str_arr=($(for i in "${str_arr[@]}"; do echo $i; done | sort -R ))
@@ -181,6 +192,7 @@ parse_args () {
 		esac
 		shift
 	done
+	return
 }
 
 parse_args "$@"
