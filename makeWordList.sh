@@ -33,9 +33,7 @@ usage () {
 
 get_random_elements () {
 	# from the given array, return random elements
-	#
 	# get_random_elements [OPTIONS] ARRAY
-	#
 	# Available Options:
 	# -n, --number=NUMBER
 	#     return NUMBER elements from the array
@@ -46,24 +44,22 @@ get_random_elements () {
 	#     turn on fickle mode
 	#     instead of returning NUMBER elements from the array, return any
 	#     no. of elements from 1 to NUMBER, at max.
-	#
 	declare -i number=3
 	declare delimiter=''
 	declare -a array
-	local fickle
 
 	while [[ -n $1 ]]; do
 		case $1 in
-			-n | --number )	shift
-			              	number=$1
-							;;
+			-n | --number )		shift
+			              		number=$1
+						;;
 			-d | --delimiter )	shift
 			                 	delimiter=$1
-								;;
-			-f | --fickle )	fickle=true
-			              	;;
-			* )	array+=($1)
-				;;
+						;;
+			-f | --fickle )		local fickle=true
+			              		;;
+			* )			array+=($1)
+						;;
 		esac
 		shift
 	done
@@ -73,20 +69,61 @@ get_random_elements () {
 		local max_digits=$number
 		number=$(($RANDOM%$max_digits))
 	fi
-		echo "${jumbled[@]:0:$number}" | sed "s/ /$delimiter/g"
+	echo "${jumbled[@]:0:$number}" | sed "s/ /$delimiter/g"
 
 	return
 }
 
 is_inappropriate_word () {
-	# an attempt to prevent inappropriate words from slipping in to the final worlist
+	# An attempt to prevent inappropriate words from slipping in to the final worlist
 	# because some were slipping in, at times
+	# takes a word as an argument
 	declare -a inapprop_rot1 # ROT1 encoded array of inappropriate words
 	inapprop_rot1=( gvdl tiju dvou ) # Curse Words
 	inapprop_rot1+=( btt cppc csfbtu qfojt wbhjob ) # Body Parts
 	inapprop_rot1+=( epvdif ejdl gbh tmvu cjudi ) # Insults
 	inapprop_rot1+=( tfy ) # Verbs
 	grep -E --silent --ignore-case "$(echo ${inapprop_rot1[*]} | tr ' ' '|')" <<< "$(echo $1 | tr a-z b-za)"
+	return
+}
+
+parse_args () {
+	if [[ -z "$1" ]]; then
+		usage >&2
+		exit 1
+	fi
+
+	while [[ -n $1 ]]; do
+		case $1 in
+			-h | --help )				usage
+								exit
+								;;
+			-i | --interactive )			interactive_mode=1
+								break
+								;;
+			-u | --user-name )			shift
+								user_name=$1
+								;;
+			--no-filter )				filter='off'
+								;;
+			--max-words )				shift
+								max_words=$1
+								;;
+			$(echo $1 | grep [[:alpha:]]) )		alpha_keys+=$(echo $1 | grep --only-matching [[:alpha:]] | tr -d '\n')
+								letters_learnt=$(echo $alpha_keys | grep -o . | sort --ignore-case | uniq -i | tr -d '\n')
+								;;&
+			$(echo $1 | grep [[:digit:]]) )		numeric_matches+=$(echo $1 | grep --only-matching [[:digit:]] | tr -d '\n')
+								declare -ga numeric_keys
+								readarray -t numeric_keys < <(echo $numeric_matches | tr -c -d [:digit:] | grep -o . | sort | uniq)
+								;;&
+			$(echo $1 | grep [[:punct:]]) )		special_matches+=$(echo $1 | grep --only-matching [[:punct:]] | tr -d '\n')
+								[[ "$special_matches" =~ \" ]] && auto_add=\'
+								declare -ga special_keys
+								readarray -t special_keys < <(echo $special_matches $auto_add | grep -o . | sort | uniq)
+								;;
+		esac
+		shift
+	done
 	return
 }
 
@@ -126,73 +163,30 @@ interactive () {
 main () {
 	echo "${user_name:-$USER} [Keys: ${letters_learnt^^} ${numeric_keys[@]} ${special_keys[@]}]" > $WORD_LIST_FILE
 
-	grep -i "^[${letters_learnt}]\{1,\}$" /usr/share/dict/words | sort --ignore-case | uniq --ignore-case | sort -R \
+	grep -Ei "^[${letters_learnt}]{1,}$" /usr/share/dict/words | sort --ignore-case | uniq --ignore-case | sort -R \
 		| head -n ${max_words:-175} > $WORD_BUFFER_FILE
+	grep -Ei "^[${letters_learnt}]{1,}$" <<< "BARSHA" >> $WORD_BUFFER_FILE # The pal I originally wrote this script for
 
-	for word in $(cat $WORD_BUFFER_FILE); do
-		if [[ $filter != 'off' ]]; then
-			is_inappropriate_word $word && continue
-		fi
+	[[ "${#special_keys[@]}" -eq 0 ]] && special_keys+=('')
 
-		if [[ ( ${#numeric_keys[@]} -eq 0 ) && ( ${#special_keys[@]} -eq 0 ) ]]; then
-			echo "${word^^}" >> $WORD_LIST_FILE
-		else
-			[[ "${#special_keys[@]}" -eq 0 ]] && special_keys+=('')
-			str_arr=()
-			str_arr+=$(get_random_elements -n 3 -f "${numeric_keys[@]}")
-			str_arr+=$(get_random_elements -n 2 -d ' ' -f "${special_keys[@]}")
-			str_arr+=(${word^^})
-			[[ $(($RANDOM%7)) == 0 ]] && str_arr+=(${word_buffer^^})
-			jumbled_str_arr=($(for i in "${str_arr[@]}"; do echo $i; done | sort -R ))
-			echo "${jumbled_str_arr[@]}" | sed -r 's_([[:punct:]]) ([^[:punct:]])_\1\2_' | sed -r 's_([^[:punct:]]) ([[:punct:]])_\1\2_' >> $WORD_LIST_FILE
-			[[ $(($RANDOM%2)) == 0 ]] && word_buffer=$word
-		fi
+	for word in $(cat $WORD_BUFFER_FILE | sort -R); do
+		[[ $filter != 'off' ]] && is_inappropriate_word $word && continue
+
+		str_arr=()
+		str_arr+=$(get_random_elements -n 3 -f "${numeric_keys[@]}")
+		str_arr+=$(get_random_elements -n 2 -d ' ' -f "${special_keys[@]}")
+		str_arr+=(${word^^})
+		[[ $(($RANDOM%7)) == 0 ]] && str_arr+=(${word_buffer^^})
+
+		jumbled_str_arr=($(for i in "${str_arr[@]}"; do echo $i; done | sort -R ))
+		echo "${jumbled_str_arr[@]}" | sed -r 's_([[:punct:]]) ([^[:punct:]])_\1\2_' | sed -r 's_([^[:punct:]]) ([[:punct:]])_\1\2_' >> $WORD_LIST_FILE
+
+		[[ $(($RANDOM%2)) == 0 ]] && word_buffer=$word
 	done
 
 	rm $WORD_BUFFER_FILE
 	[[ -d ~/.tuxtype/words ]] || mkdir -p ~/.tuxtype/words
 	mv $WORD_LIST_FILE ~/.tuxtype/words/wordList_${BUILD_DATE}.txt
-}
-
-parse_args () {
-	# Parse Command Line Arguments
-	if [[ -z "$1" ]]; then
-		usage >&2
-		exit 1
-	fi
-	
-	while [[ -n $1 ]]; do
-		case $1 in
-			-h | --help )						usage
-												exit
-												;;
-			-i | --interactive )				interactive_mode=1
-												break
-												;;
-			-u | --user-name )					shift
-												user_name=$1
-												;;
-			--no-filter )						filter='off'
-												;;
-			--max-words )						shift
-												max_words=$1
-												;;
-			$(echo $1 | grep [[:alpha:]]) )		alpha_keys+=$(echo $1 | grep --only-matching [[:alpha:]] | tr -d '\n')
-												letters_learnt=$(echo $alpha_keys | grep -o . | sort --ignore-case | uniq -i | tr -d '\n')
-												;;&
-			$(echo $1 | grep [[:digit:]]) )		numeric_matches+=$(echo $1 | grep --only-matching [[:digit:]] | tr -d '\n')
-												declare -ga numeric_keys
-												readarray -t numeric_keys < <(echo $numeric_matches | tr -c -d [:digit:] | grep -o . | sort | uniq)
-												;;&
-			$(echo $1 | grep [[:punct:]]) )		special_matches+=$(echo $1 | grep --only-matching [[:punct:]] | tr -d '\n')
-												[[ "$special_matches" =~ \" ]] && auto_add=\'
-												declare -ga special_keys
-												readarray -t special_keys < <(echo $special_matches $auto_add | grep -o . | sort | uniq)
-												;;
-		esac
-		shift
-	done
-	return
 }
 
 parse_args "$@"
