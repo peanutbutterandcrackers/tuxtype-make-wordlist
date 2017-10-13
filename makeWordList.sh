@@ -7,6 +7,8 @@ WORD_BUFFER_FILE=$(mktemp /tmp/${SCRIPT_NAME%%.*}-words.$$.XXXXX.txt)
 WORD_LIST_FILE=$(mktemp /tmp/${SCRIPT_NAME%%.*}-wordList.$$.XXXXX.txt)
 trap "rm $WORD_BUFFER_FILE $WORD_LIST_FILE; echo; exit 1" SIGINT SIGTERM
 
+cprint () { echo -e "\033[01;31m$*\033[00m"; }
+
 usage () {
 	echo "$SCRIPT_NAME: usage: $SCRIPT_NAME [OPTIONS] ALPHABETIC-KEYS [NON-ALPHABETIC-KEYS]"
 	echo
@@ -133,26 +135,26 @@ interactive () {
 		alphas=$(echo $alphas | tr -d -c [:alpha:])
 	done
 	letters_learnt=$(echo $alphas | grep -o . | sort --ignore-case | uniq -i | tr -d '\n')
-	echo $letters_learnt
+	cprint $letters_learnt
 
 	echo -n "Enter the numeric keys that you have learned, if any > "
 	read numerics
 	numerics=$(echo $numerics | tr -d -c [:digit:])
 	declare -g -a numeric_keys
 	readarray -t numeric_keys < <(echo $numerics | tr -c -d [:digit:] | grep -o . | sort | uniq)
-	echo "${numeric_keys[@]}"
+	cprint "${numeric_keys[@]}"
 
 	echo -n "Enter the special keys (punctuations) that you have learned, if any > "
 	read -r specials
 	specials=$(echo $specials | tr -d -c [:punct:])
 	declare -g -a special_keys
 	readarray -t special_keys < <(echo $specials | grep -o . | sort | uniq)
-	echo "${special_keys[@]}"
+	cprint "${special_keys[@]}"
 
 	if [[ -z $user_name ]]; then
 		echo -n "Enter your name [OPTIONAL] > "
 		read user_name
-		[[ -n $user_name ]] && echo "$user_name"
+		[[ -n $user_name ]] && cprint "$user_name"
 	fi
 
 	echo "Generating word list. Please wait."
