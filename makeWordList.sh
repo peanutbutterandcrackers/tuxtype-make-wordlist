@@ -6,7 +6,6 @@ SCRIPT_NAME=$(basename $0)
 WORD_BUFFER_FILE=$(mktemp /tmp/${SCRIPT_NAME%%.*}-words.$$.XXXXX.txt)
 WORD_LIST_FILE=$(mktemp /tmp/${SCRIPT_NAME%%.*}-wordList.$$.XXXXX.txt)
 OUTPUT_PATH="$HOME/.tuxtype/words"
-OUTPUT_NAME="wordList_${BUILD_DATE}.txt"
 trap "rm $WORD_BUFFER_FILE $WORD_LIST_FILE; echo; exit 1" SIGINT SIGTERM
 
 cprint () { echo -e "\033[01;31m$*\033[00m"; }
@@ -31,7 +30,8 @@ usage () {
 		                                          increase the execution time. Decrease the value for faster generation on slower machines.
 		--no-header				->Do not put a header line in the generated word-list
 		-I, --case-sensitive			->Generate a case-sensitive word-list file; for case-sensitive lessons
-		-o, --output-path			->Specify path to output the wordlist; instead of ~/.tuxtype/words
+		-o, --output-path [PATH STRING]		->Specify path to output the wordlist; instead of ~/.tuxtype/words.
+
 
 		Make Sure the NON-ALPHABETIC-KEYS are enclosed with single quotes, like so: '$@#-+/'
 
@@ -225,7 +225,8 @@ main () {
 
 	rm $WORD_BUFFER_FILE
 	[[ -d ~/.tuxtype/words ]] || mkdir -p ~/.tuxtype/words
-	mv $WORD_LIST_FILE $OUTPUT_PATH/$OUTPUT_NAME
+	mv $WORD_LIST_FILE $(dirname $WORD_LIST_FILE)/wordList_${BUILD_DATE}.txt
+	mv $(dirname $WORD_LIST_FILE)/wordList_${BUILD_DATE}.txt $OUTPUT_PATH
 }
 
 parse_args "$@"
