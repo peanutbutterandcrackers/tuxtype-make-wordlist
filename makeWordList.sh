@@ -25,6 +25,7 @@ usage () {
 		                                          words might slip in to the final word list. Use wisely.
 		--max-words INTEGER			->Sets the maximum word generation limit for the script. Default is 175. Higher values
 		                                          increase the execution time. Decrease the value for faster generation on slower machines.
+		--no-header				->Do not put a header line in the generated word-list
 
 		Make Sure the NON-ALPHABETIC-KEYS are enclosed with single quotes, like so: '$@#-+/'
 
@@ -111,6 +112,8 @@ parse_args () {
 			--max-words )				shift
 								max_words=$1
 								;;
+			--no-header )				exclude_header=1
+								;;
 			$(echo $1 | grep [[:alpha:]]) )		alpha_keys+=$(echo $1 | grep --only-matching [[:alpha:]] | tr -d '\n')
 								letters_learnt=$(echo $alpha_keys | grep -o . | sort --ignore-case | uniq -i | tr -d '\n')
 								;;&
@@ -126,6 +129,12 @@ parse_args () {
 		esac
 		shift
 	done
+
+	if [[ (-z "$letters_learnt") && ("$interactive_mode" -ne 1) ]]; then
+		usage >&2
+		exit 1
+	fi
+
 	return
 }
 
@@ -163,7 +172,7 @@ interactive () {
 }
 
 main () {
-	echo "${user_name:-$USER} [Keys: ${letters_learnt^^} ${numeric_keys[@]} ${special_keys[@]}]" > $WORD_LIST_FILE
+	[ "$exclude_header" -ne 1 ] && echo "${user_name:-$USER} [Keys: ${letters_learnt^^} ${numeric_keys[@]} ${special_keys[@]}]" > $WORD_LIST_FILE
 
 	grep -Ei "^[${letters_learnt}]{1,}$" /usr/share/dict/words | sort --ignore-case | uniq --ignore-case | sort -R \
 		| head -n ${max_words:-175} > $WORD_BUFFER_FILE
