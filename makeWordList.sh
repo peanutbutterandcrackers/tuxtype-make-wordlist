@@ -28,6 +28,7 @@ usage () {
 		--max-words INTEGER			->Sets the maximum word generation limit for the script. Default is 175. Higher values
 		                                          increase the execution time. Decrease the value for faster generation on slower machines.
 		--no-header				->Do not put a header line in the generated word-list
+		-I, --case-sensitive			->Generate a case-sensitive word-list file; for case-sensitive lessons
 
 		Make Sure the NON-ALPHABETIC-KEYS are enclosed with single quotes, like so: '$@#-+/'
 
@@ -116,6 +117,8 @@ parse_args () {
 								;;
 			--no-header )				exclude_header=1
 								;;
+			-I | --case-sensitive )			case_sensitivity=1
+								;;
 			$(echo $1 | grep [[:alpha:]]) )		alpha_keys+=$(echo $1 | grep --only-matching [[:alpha:]] | tr -d '\n')
 								letters_learnt=$(echo $alpha_keys | grep -o . | sort --ignore-case | uniq -i | tr -d '\n')
 								;;&
@@ -174,23 +177,40 @@ interactive () {
 }
 
 main () {
-	[ "$exclude_header" -ne 1 ] && echo "${user_name:-$USER} [Keys: ${letters_learnt^^} ${numeric_keys[@]} ${special_keys[@]}]" > $WORD_LIST_FILE
+	[[ "$exclude_header" -eq 1 ]] || echo "${user_name:-$USER} [Keys: ${letters_learnt} ${numeric_keys[@]} ${special_keys[@]}]" > $WORD_LIST_FILE
 
 	grep -Ei "^[${letters_learnt}]{1,}$" /usr/share/dict/words | sort --ignore-case | uniq --ignore-case | sort -R \
 		| head -n ${max_words:-175} > $WORD_BUFFER_FILE
-	grep -Ei "^[${letters_learnt}]{1,}$" <<< "BARSHA" >> $WORD_BUFFER_FILE # The pal I originally wrote this script for
+	grep -Ei "^[${letters_learnt}]{1,}$" <<< "Barsha" >> $WORD_BUFFER_FILE # The pal I originally wrote this script for
 
 	[[ "${#special_keys[@]}" -eq 0 ]] && special_keys+=('')
+	readarray -t UPPERCASES < <(echo $letters_learnt | grep -o [[:upper:]])
+	readarray -t LOWERCASES < <(echo $letters_learnt | grep -o [[:lower:]])
 
 	for word in $(cat $WORD_BUFFER_FILE | sort -R); do
 		[[ $filter != 'off' ]] && is_inappropriate_word $word && continue
 
+		if [[ "$case_sensitivity" -eq 1 ]]; then
+			lowers=$(echo "${LOWERCASES[@]}" | tr -d [:space:])
+			word=$(echo $word | tr "${lowers^^}" "${lowers}")
+			first_letter=${word:0:1}
+			remainder=${word:1}
+			if grep -i --silent $first_letter <<< "${UPPERCASES[@]}"; then
+				first_letter=${first_letter^^}
+			fi
+			for u in $(get_random_elements -d '\n' -f -n 3 ${UPPERCASES[@]}); do
+				remainder=${remainder/${u,,}/$u}
+			done
+			word=$(echo -n $first_letter $remainder | tr -d [:space:])
+		else
+			word=(${word^^})
+		fi
+
 		str_arr=()
 		str_arr+=$(get_random_elements -n 3 -f "${numeric_keys[@]}")
 		str_arr+=$(get_random_elements -n 2 -d ' ' -f "${special_keys[@]}")
-		str_arr+=(${word^^})
-		[[ $(($RANDOM%7)) == 0 ]] && str_arr+=(${word_buffer^^})
-
+		str_arr+=$word
+		[[ $(($RANDOM%7)) == 0 ]] && str_arr+=(${word_buffer})
 		jumbled_str_arr=($(for i in "${str_arr[@]}"; do echo $i; done | sort -R ))
 		echo "${jumbled_str_arr[@]}" | sed -r 's_([[:punct:]]) ([^[:punct:]])_\1\2_' | sed -r 's_([^[:punct:]]) ([[:punct:]])_\1\2_' >> $WORD_LIST_FILE
 
