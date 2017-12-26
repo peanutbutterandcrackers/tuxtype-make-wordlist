@@ -10,7 +10,9 @@ trap "rm $WORD_BUFFER_FILE $WORD_LIST_FILE; echo; exit 1" SIGINT SIGTERM
 cprint () { echo -e "\033[01;31m$*\033[00m"; }
 
 usage () {
-	echo "$SCRIPT_NAME: usage: $SCRIPT_NAME [OPTIONS] ALPHABETIC-KEYS [NON-ALPHABETIC-KEYS]"
+	echo "$SCRIPT_NAME:"
+	echo "Usage: $SCRIPT_NAME [OPTIONS] ALPHABETIC-KEYS [NON-ALPHABETIC-KEYS]"
+	echo "   Or: $SCRIPT_NAME [OPTIONS] -i"
 	echo
 	echo "Create custom Tuxtype levels out of the keys that you have learned"
 	echo
